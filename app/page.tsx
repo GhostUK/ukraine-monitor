@@ -32,6 +32,14 @@ type NewsItem = {
   link?: string;
 };
 
+type SafetyTone = 'safe' | 'warning' | 'danger';
+
+type SafetyStatus = {
+  title: string;
+  text: string;
+  tone: SafetyTone;
+};
+
 type VideoChannel = {
   id: string;
   name: string;
@@ -342,28 +350,44 @@ export default function UkraineMonitorDashboard() {
     return selectedRegion === 'Усі області' ? displayedNews.length : regionOnlyNews.length;
   }, [selectedRegion, displayedNews.length, regionOnlyNews.length]);
 
-  const safetyStatus = useMemo<{ title: string; text: string; tone: SafetyTone }>(() => {
-    if (selectedRegion === 'Усі області') {
-      if (counts.alert > 0) {
-        return {
-          title: 'Небезпека по країні',
-          text: `Зараз активні тривоги у ${counts.alert} областях, часткові — у ${counts.partial}.`,
-          tone: 'danger',
-        };
-      }
-      if (counts.partial > 0) {
-        return {
-          title: 'Часткова небезпека',
-          text: `Часткові тривоги є у ${counts.partial} областях.`,
-          tone: 'warning',
-        };
-      }
+  const safetyStatus = useMemo<SafetyStatus>(() => {
+  if (selectedRegion === 'Усі області') {
+    if (counts.alert > 0) {
       return {
-        title: 'Ситуація спокійна',
-        text: 'По країні зараз немає активних тривог у відображених областях.',
-        tone: 'safe',
+        title: 'Небезпека по країні',
+        text: `Зараз активні тривоги у ${counts.alert} областях, часткові — у ${counts.partial}.`,
+        tone: 'danger',
       };
     }
+
+    if (counts.partial > 0) {
+      return {
+        title: 'Часткова небезпека',
+        text: `Часткові тривоги є у ${counts.partial} областях.`,
+        tone: 'warning',
+      };
+    }
+
+    return {
+      title: 'Ситуація спокійна',
+      text: 'По країні зараз немає активних тривог у відображених областях.',
+      tone: 'safe',
+    };
+  }
+
+  return {
+    title: 'Статус області',
+    text: 'Оцінка ситуації для вибраної області.',
+    tone: 'safe',
+  };
+}, [selectedRegion, counts]);
+
+const currentSafetyToneClass =
+  safetyStatus.tone === 'safe'
+    ? safetyToneClass.safe
+    : safetyStatus.tone === 'warning'
+      ? safetyToneClass.warning
+      : safetyToneClass.danger;
 
     const regionStatus = regionStatusMap[selectedRegion] || 'clear';
     if (regionStatus === 'alert') {
@@ -383,7 +407,7 @@ export default function UkraineMonitorDashboard() {
     return {
       title: `Без активної тривоги: ${selectedRegion}`,
       text: 'Для вибраної області активна тривога зараз не відображається. Модуль готовий для підключення реального API.',
-      tone: 'safe',
+      tone: title,
     };
   }, [selectedRegion, regionStatusMap, counts]);
 
@@ -512,7 +536,7 @@ export default function UkraineMonitorDashboard() {
             <Shield className="h-5 w-5 text-cyan-300" />
             <h2 className="text-xl font-semibold">Статус безпеки</h2>
           </div>
-          <div className={`rounded-2xl border px-4 py-4 ${safetyToneClass[safetyStatus.tone]}`}>
+          <div className={`rounded-2xl border px-4 py-4 ${currentSafetyToneClass}`}>
             <div className="mb-1 flex items-center gap-2 font-semibold">
               <AlertTriangle className="h-4 w-4" />
               {safetyStatus.title}
