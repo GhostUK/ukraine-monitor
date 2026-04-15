@@ -342,7 +342,7 @@ export default function UkraineMonitorDashboard() {
     return selectedRegion === 'Усі області' ? displayedNews.length : regionOnlyNews.length;
   }, [selectedRegion, displayedNews.length, regionOnlyNews.length]);
 
-  const safetyStatus = useMemo(() => {
+  const safetyStatus = useMemo<{ title: string; text: string; tone: SafetyTone }>(() => {
     if (selectedRegion === 'Усі області') {
       if (counts.alert > 0) {
         return {
@@ -417,11 +417,11 @@ export default function UkraineMonitorDashboard() {
     alert: 'Активна',
   };
 
-  const safetyToneClass = {
+  const safetyToneClass: Record<SafetyTone, string> = {
     safe: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-200',
     warning: 'border-amber-500/20 bg-amber-500/10 text-amber-200',
     danger: 'border-red-500/20 bg-red-500/10 text-red-200',
-  } as const;
+  };
 
   const handleRefreshNews = async () => {
     setIsRefreshing(true);
@@ -512,7 +512,7 @@ export default function UkraineMonitorDashboard() {
             <Shield className="h-5 w-5 text-cyan-300" />
             <h2 className="text-xl font-semibold">Статус безпеки</h2>
           </div>
-          <div className={`rounded-2xl border px-4 py-4 ${safetyToneClass[safetyStatus.tone as keyof typeof safetyToneClass]}`}>
+          <div className={`rounded-2xl border px-4 py-4 ${safetyToneClass[safetyStatus.tone]}`}>
             <div className="mb-1 flex items-center gap-2 font-semibold">
               <AlertTriangle className="h-4 w-4" />
               {safetyStatus.title}
