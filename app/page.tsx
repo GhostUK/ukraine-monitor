@@ -512,7 +512,7 @@ export default function UkraineMonitorDashboard() {
             <Shield className="h-5 w-5 text-cyan-300" />
             <h2 className="text-xl font-semibold">Статус безпеки</h2>
           </div>
-          <div className={`rounded-2xl border px-4 py-4 ${safetyToneClass[safetyStatus.tone]}`}>
+          <div className={`rounded-2xl border px-4 py-4 ${safetyToneClass[safetyStatus.tone as keyof typeof safetyToneClass]}`}>
             <div className="mb-1 flex items-center gap-2 font-semibold">
               <AlertTriangle className="h-4 w-4" />
               {safetyStatus.title}
