@@ -189,7 +189,7 @@ async function readRssFeed(source: FeedSource): Promise<NewsItem[]> {
 function extractRegionalLinks(html: string, source: FeedSource): NewsItem[] {
   const now = new Date().toISOString();
   const matches = Array.from(
-    html.matchAll(/<a[^>]+href="(https:\/\/suspilne\.media\/[^"]+)"[^>]*>(.*?)<\/a>/gims)
+    html.matchAll(/<a[^>]+href="(https:\/\/suspilne\.media\/[^"]+)"[^>]*>(.*?)<\/a>/gm)
   );
 
   const cleaned = matches
